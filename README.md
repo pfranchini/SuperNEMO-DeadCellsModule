@@ -1,4 +1,7 @@
 # SuperNEMO-DeadCellsModule
+
+Paolo Franchini - p.franchini@imperial.ac.uk
+
 SuperNEMO module for removing hits for Dead Cells in the Tracker
 
 ## Build:
