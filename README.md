@@ -12,6 +12,14 @@ cd SuperNEMO-DeadCellsModule.build
 cmake -DCMAKE_PREFIX_PATH=<path_Falaise_build> -DGSL_ROOT_DIR=<path_GSL_build> ../SuperNEMO-DeadCellsModule
 make
 ```
+## Configure the module:
+
+There is the option to configure the output filename in the module configuration file.The final two lines of the configuration file must have:
+```
+[name="processing" type="testmodule"]
+filename_out : string[1] = "output-filename.brio"
+```
+If not the default output will be `test-output.brio`.
 
 ## Run the module:
 ```
