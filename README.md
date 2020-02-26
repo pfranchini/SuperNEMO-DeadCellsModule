@@ -1,6 +1,6 @@
 # SuperNEMO-DeadCellsModule
 
-Paolo Franchini - p.franchini@imperial.ac.uk
+Paolo Franchini 2020 - p.franchini@imperial.ac.uk
 
 SuperNEMO module for removing hits for Dead Cells in the Tracker
 
@@ -23,7 +23,7 @@ If not the default output will be `test-output.brio`.
 
 ## Run the module:
 ```
-flreconstruct -i <brio_file_with_calibration_bank.brio> -p testmodule.conf.in
+flreconstruct -i <brio_file_with_calibration_bank.brio> -p testmodule.conf
 ```
 
 ## Run the remaining reconstruction:
