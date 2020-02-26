@@ -20,6 +20,7 @@ add_library(testmodule SHARED testmodule.h testmodule.cpp FLSimulateCommandLine.
 target_link_libraries(testmodule
   PUBLIC
     Falaise::FalaiseModule
+    Bayeux::Bayeux_mctools_geant4		
     ${ROOT_Physics_LIBRARY}
     )
 
