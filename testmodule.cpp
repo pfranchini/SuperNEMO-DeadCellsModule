@@ -230,7 +230,6 @@ testmodule::process(datatools::things& event) {
       // .....
 
       if ((trackerHitHdl->get_side()!=1) || (trackerHitHdl->get_layer()!=4) || (trackerHitHdl->get_row()!=86)) {
-	      //if (trackerHitHdl->get_row()==86) {
 
 	i = &trackerHitHdl - &calData.calibrated_tracker_hits()[0];
 

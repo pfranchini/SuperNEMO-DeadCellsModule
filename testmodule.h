@@ -1,8 +1,9 @@
 //! \file    testmodule.h
-//! \brief   Example processing module for flreconstruct
+//! \brief   Processing module for flreconstruct
 //! \details Process a things object
 #ifndef TESTMODULE_HH
 #define TESTMODULE_HH
+
 // Standard Library
 #include <vector>
 #include <string>
@@ -18,24 +19,23 @@
 
 // - Bayeux
 #include "bayeux/dpp/base_module.h"
+#include "bayeux/dpp/output_module.h"
 #include "bayeux/mctools/simulated_data.h"
 #include "bayeux/mctools/utils.h"
 #include "bayeux/datatools/service_manager.h"
 #include "bayeux/geomtools/manager.h"
 #include "bayeux/geomtools/geometry_service.h"
-#include "bayeux/dpp/output_module.h"
-#include "bayeux/mctools/utils.h"
 #include "bayeux/version.h"
 
 // - Falaise
-#include <falaise/snemo/datamodels/calibrated_data.h>
 #include "falaise/falaise.h"
 #include "falaise/exitcodes.h"
-#include "falaise/falaise.h"
 #include "falaise/resource.h"
+#include "falaise/version.h"
+#include <falaise/snemo/datamodels/calibrated_data.h>
 #include "falaise/snemo/datamodels/data_model.h"
 #include "falaise/snemo/services/services.h"
-#include "falaise/version.h"
+
 
 
 // This Project

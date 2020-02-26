@@ -14,7 +14,7 @@
 // This Project:
 #include "FLSimulateCommandLine.h"
 #include "FLSimulateErrors.h"
-#include "falaise/property_reader.h"
+#include "falaise/config/property_reader.h"
 
 namespace FLSimulate {
 
