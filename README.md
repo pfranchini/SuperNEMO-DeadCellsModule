@@ -20,7 +20,7 @@ make
 ```
 
 ## Configure the module:
-There is the way to configure the module, for the name of the output file and the option to use a list of dead cells or a randomized generation:
+There is the way to configure the module, for the name of the output file and the option to use a list of dead cells or a randomized generation, using `testmodule.conf` produced in the build directory:
 ```
 # - Module configuration:                                                                                                                                                  
 [name="processing" type="testmodule"]
