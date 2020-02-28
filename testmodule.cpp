@@ -1,29 +1,38 @@
+/*=================================================================
+/
+/ SuperNemo - Dead Cells Module
+/
+/ Paolo Franchini 2020 - p.franchini@imperial.ac.uk
+/ https://github.com/pfranchini/SuperNEMO-DeadCellsModule
+/
+===================================================================*/
+
 #include "testmodule.h"
 
-// Variables here:
-
-//  output file
+// output file
 dpp::output_module simOutput;
 
-//  event output
+// event output
 datatools::things workItem;
 dpp::base_module::process_status status;
-//snemo::datamodel::calibrated_data* ptr_calib_data = 0;
 snemo::datamodel::calibrated_data *new_calibrated_data;
 
 // metadata
 FLSimulate::FLSimulateArgs flSimParameters;
 
 // various variables
+bool randomize = true;
 std::string filename_output = "test-output.brio";
-const int N_dead_cells=100;
-int dead_cells[N_dead_cells][3];  // Define a matrix (side, layer, column) of dead cells 
+int N_dead_cells;
+std::string dead_cells_list;
+int dead_cells[2500][3];  // Define a matrix (side, layer, column) of dead cells 
 Long64_t hits = 0;
 Long64_t killed = 0;
 
 
 DPP_MODULE_REGISTRATION_IMPLEMENT(testmodule,"testmodule");
 
+//=================================================================
 
 testmodule::testmodule() : dpp::base_module() {}
 
@@ -41,7 +50,6 @@ falaise::exit_code do_metadata( const FLSimulate::FLSimulateArgs& flSimParameter
   // System section:
   datatools::properties& system_props = flSimMetadata.add_section("flsimulate", "flsimulate::section");
   system_props.set_description("flsimulate basic system informations");
-
   system_props.store_string("bayeux.version", bayeux::version::get_version(),
                             "Bayeux version");
   system_props.store_string("falaise.version", falaise::version::get_version(),
@@ -142,18 +150,62 @@ falaise::exit_code do_metadata( const FLSimulate::FLSimulateArgs& flSimParameter
 }
 
 
-void testmodule::initialize(const datatools::properties& myConfig,
-                                   datatools::service_manager& flServices,
-                                   dpp::module_handle_dict_type& /*moduleDict*/){
+void dead_cells_service(int dc[2500][3]) {
 
-  // Extract the filename_out key from the supplied config, if
-  // the key exists. datatools::properties throws an exception if
-  // the key isn't in the config, so catch this if thrown and don't do
-  // anything
+  try {
+    std::ifstream infile(dead_cells_list);   // File for list of dead cells
+    Long64_t i=0;
+    int side, layer, column;
+    while (infile >> side >> layer >> column){
+      dead_cells[i][0]=side;
+      dead_cells[i][1]=layer;
+      dead_cells[i][2]=column;
+      i++;
+    }
+    N_dead_cells=i;
+    std::cout << "Read " << N_dead_cells << " dead cells" << std::endl;
+  }
+  catch (std::logic_error& e) {
+    std::cerr << "Problem in the list of dead cells " << e.what() << std::endl;
+  };
+  
+
+};
+
+
+void testmodule::initialize(const datatools::properties& myConfig,
+			    datatools::service_manager& flServices,
+			    dpp::module_handle_dict_type& /*moduleDict*/){
+
+  // Extract the filename_out key from the supplied config, if the key exists.
+  // datatools::properties throws an exception if the key isn't in the config, so catch this if thrown
   try {
     myConfig.fetch("filename_out", filename_output);
+  }
+  catch (std::logic_error& e) {
+    std::cerr << "Problem in the output file " << e.what() << std::endl;
+  };
+
+  // Extract option to create random dead cells or to read them (from a file)   
+  try {
+    myConfig.fetch("random", randomize);
+    if (randomize)
+      try {
+	myConfig.fetch("N_dead_cells", N_dead_cells);
+      }
+      catch (std::logic_error& e) {
+	std::cerr << "Error in configuration files: number of dead cells not present " << e.what() << std::endl;
+      }
+    else
+      try {
+        myConfig.fetch("dead_cells", dead_cells_list);
+      } 
+      catch (std::logic_error& e) {
+	std::cerr << "Error in configuration files: file with list of dead cells not present " << e.what() << std::endl;
+      } 
   } catch (std::logic_error& e) {}
 
+  
   std::cout << "Dead cells module initialized..." << std::endl;
   std::cout << "Output file: " << filename_output << std::endl;
   
@@ -183,35 +235,42 @@ void testmodule::initialize(const datatools::properties& myConfig,
   new_calibrated_data = &(workItem.add<snemo::datamodel::calibrated_data>("CD"));
 
   // Define the dead cells:
-  // Random dead cells
-  bool isNew = false;
-  std::cout << "Generating " << N_dead_cells << " random dead cells..." << std::endl;
-  for (Long64_t i=0; i<N_dead_cells; i++){
-    // need to check if the dead_cell is not already in the list                                                                                                          
-    isNew = false;
-    while (!isNew) {  // try a random cell                                                                                                                                
-      dead_cells[i][0]=rand() % 2;    // side                                                                                                                             
-      dead_cells[i][1]=rand() % 9;    // layer                                                                                                                            
-      dead_cells[i][2]=rand() % 113;  // column                                                                                                                           
-      isNew = true; // assume is new                                                                                                                                      
-      for (Long64_t j=0; j<i; j++){  // look if is alredy in the  matrix                                                                                                  
-	if ( (dead_cells[i][0]==dead_cells[j][0]) && (dead_cells[i][1]==dead_cells[j][1]) && (dead_cells[i][2]==dead_cells[j][2]) ) {
-	  isNew = false; // is already in the matrix so will try again                                                                                                    
-	  break;
+
+  if (randomize) {
+    // Random dead cells
+    bool isNew = false;
+    std::cout << "Generating " << N_dead_cells << " random dead cells..." << std::endl;
+    for (Long64_t i=0; i<N_dead_cells; i++){
+      // need to check if the dead_cell is not already in the list
+      isNew = false;
+      while (!isNew) {  // try a random cell
+	dead_cells[i][0]=rand() % 2;    // side
+	dead_cells[i][1]=rand() % 9;    // layer
+	dead_cells[i][2]=rand() % 113;  // column
+	isNew = true; // assume is new
+	for (Long64_t j=0; j<i; j++){  // look if is alredy in the  matrix
+	  if ( (dead_cells[i][0]==dead_cells[j][0]) && (dead_cells[i][1]==dead_cells[j][1]) && (dead_cells[i][2]==dead_cells[j][2]) ) {
+	    isNew = false; // is already in the matrix so will try again
+	    break;
+	  }
 	}
       }
     }
   }
-  
+  else {
+    // Dead cells from service
+    std::cout << "Reading dead cells..." << std::endl;
+    dead_cells_service(dead_cells);
+  }
+
   // print list of dead cells   
   /*for (Long64_t i=0; i<N_dead_cells; i++)                                                                                                                             
     std::cout << dead_cells[i][0] << "-" << dead_cells[i][1] << "-" << dead_cells[i][2] << std::endl;                                                                     
   */
-  
+
   this->_set_initialized(true);
   
 }
-
 
 //! [testmodule::Process]
 dpp::base_module::process_status testmodule::process(datatools::things& event) {
@@ -239,7 +298,6 @@ dpp::base_module::process_status testmodule::process(datatools::things& event) {
       for (Long64_t k=0; k<N_dead_cells; k++){
 	if ( (trackerHitHdl->get_side()==dead_cells[k][0])&&(trackerHitHdl->get_layer()==dead_cells[k][1])&&(trackerHitHdl->get_row()==dead_cells[k][2]) ){  // is dead
 	  kill=true;
-	  
 	  killed++;
 	  /*i = &trackerHitHdl - &calData.calibrated_tracker_hits()[0];
 	  std::cout << "hit to be removed: " << i << std::endl;
@@ -248,12 +306,13 @@ dpp::base_module::process_status testmodule::process(datatools::things& event) {
 	  */
           break; // ends loop since the hit is already on one dead cell      
 	}
-	if (!kill){ // keeps the Tracker data
-	  new_hit_handle = trackerHitHdl;
-	  new_calibrated_data->calibrated_tracker_hits().push_back(new_hit_handle);
-  	}
       } // end loop in the killing procedure  
-    } // end loop oin the tracker hits
+      
+      if (!kill){ // keeps the Tracker data
+	new_hit_handle = trackerHitHdl;
+	new_calibrated_data->calibrated_tracker_hits().push_back(new_hit_handle);
+      }
+    } // end loop in the tracker hits
 
     // Print output                                                                                                                                                    
     /*const auto& calData2 = workItem.get<snemo::datamodel::calibrated_data>("CD");

@@ -11,7 +11,7 @@
 
 // Third Party
 #include "TFile.h"
-#include "TTree.h"
+//#include "TTree.h"
 
 // - Boost
 #include "boost/date_time/posix_time/posix_time.hpp"
@@ -36,8 +36,6 @@
 #include "falaise/snemo/datamodels/data_model.h"
 #include "falaise/snemo/services/services.h"
 
-
-
 // This Project
 #include "FLSimulateArgs.h"
 
@@ -51,7 +49,7 @@ class testmodule : public dpp::base_module {
   //! Configure the module
   virtual void initialize(const datatools::properties& myConfig,
                           datatools::service_manager& flServices,
-                          dpp::module_handle_dict_type& moduleDict);
+			  dpp::module_handle_dict_type& moduleDict);
   //! Process supplied data record
   virtual dpp::base_module::process_status process(datatools::things& workItem);
   //! Reset the module

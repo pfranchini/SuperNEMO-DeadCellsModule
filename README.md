@@ -2,7 +2,13 @@
 
 Paolo Franchini 2020 - p.franchini@imperial.ac.uk
 
-SuperNEMO module for removing hits for Dead Cells in the Tracker
+SuperNEMO module for removing hits in order to study dead cells in the Tracker.
+
+The module removes hits from the simulated data correspondent to a list of dead cells in the tracker.
+The list can be randomly generated or read from a test file.
+
+Input: simulated data with CD bank.
+Output: filtered simulated data with CD bank, to be used in a full reconstruction.
 
 ## Build:
 ```
@@ -12,14 +18,17 @@ cd SuperNEMO-DeadCellsModule.build
 cmake -DCMAKE_PREFIX_PATH=<path_Falaise_build> -DGSL_ROOT_DIR=<path_GSL_build> ../SuperNEMO-DeadCellsModule
 make
 ```
-## Configure the module:
 
-There is the option to configure the output filename in the module configuration file.The final two lines of the configuration file must have:
+## Configure the module:
+There is the way to configure the module, for the name of the output file and the option to use a list of dead cells or a randomized generation:
 ```
+# - Module configuration:                                                                                                                                                  
 [name="processing" type="testmodule"]
-filename_out : string[1] = "output-filename.brio"
+filename_out : string[1] = "test-output.brio"
+random : boolean[1] = true                        # 'false' if reading a file with a list of dead cells
+N_dead_cells : integer[1] = 0                     # number of dead cells to be randomly generated
+dead_cells : string[1] = "list_of_cells.txt"      # file with a list of dead cells (side, layer, column)
 ```
-If not the default output will be `test-output.brio`.
 
 ## Run the module:
 ```
