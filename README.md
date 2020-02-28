@@ -7,8 +7,7 @@ SuperNEMO module for removing hits in order to study dead cells in the Tracker.
 The module removes hits from the simulated data correspondent to a list of dead cells in the tracker.
 The list can be randomly generated or read from a test file.
 
-Input: simulated data with CD bank.
-
+Input: simulated data with CD bank. \
 Output: filtered simulated data with CD bank, to be used in a full reconstruction.
 
 ## Build:
