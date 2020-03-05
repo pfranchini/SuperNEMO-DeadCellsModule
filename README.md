@@ -8,7 +8,7 @@ The module removes tracker hits from the simulated data correspondent to a list 
 The list can be randomly generated or read from a text file.
 
 Input: simulated data with CD bank. \
-Output: filtered simulated data with CD bank, to be used in a full reconstruction.
+Output: filtered simulated data with CD bank, to be used in a full reconstruction; list of dead cells killed.
 
 ## Build:
 ```

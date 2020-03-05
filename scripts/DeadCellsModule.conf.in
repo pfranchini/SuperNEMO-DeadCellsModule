@@ -1,5 +1,3 @@
-# Paolo Franchini 2020 - p.franchini@imperial.ac.uk
-
 # - Configuration Metadata
 #@description Chain pipeline using a single custom module
 #@key_label   "name"
@@ -23,7 +21,8 @@ modules : string[1] = "DeadCells"
 
 # - Module configuration:
 [name="DeadCells" type="DeadCellsModule"]
-filename_out : string[1] = "test-output.brio"
-random : boolean[1] = true			# 'false' if reading a file with a list of dead cells
-N_dead_cells : integer[1] = 100			# number of dead cells to be randomly generated
-dead_cells : string[1] = "list_shorts.txt"	# file with a list of dead cells (side, layer, column)
+filename_out : string = "XXXXX"
+random : boolean = true
+N_dead_cells : integer = YYYYY
+#dead_cells : string = "list_shorts.txt"
+

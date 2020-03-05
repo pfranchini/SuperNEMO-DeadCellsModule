@@ -1,5 +1,9 @@
+#*
 *~
 .gitignore
 *.brio
 *.txt
-#*
+*.root
+*.conf
+*.log
+*/*.png

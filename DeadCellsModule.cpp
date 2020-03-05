@@ -256,6 +256,13 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
 	}
       }
     }
+    // Save list of dead cells in a text file to be used in another module
+    std::ofstream deadcells_file;
+    std::string deadcells_filename = "random_dead_cells_"+std::to_string(N_dead_cells)+".txt";
+    deadcells_file.open(deadcells_filename);
+    for (Long64_t i=0; i<N_dead_cells; i++)
+      deadcells_file << dead_cells[i][0] << " " << dead_cells[i][1] << " " << dead_cells[i][2] << "\n";      
+    deadcells_file.close();
   }
   else {
     // Dead cells from service
