@@ -28,6 +28,7 @@ target_link_libraries(DeadCellsModule
 configure_file("DeadCellsModule.conf.in" "DeadCellsModule.conf" @ONLY)
 
 file(COPY official-2.0.0_only_calibration.conf DESTINATION ${PROJECT_BINARY_DIR})
+file(COPY official-2.0.0_from_CAT.conf DESTINATION ${PROJECT_BINARY_DIR})
 
 # Add a basic test: simulated a brio, reconstruct up to calibration and runs the module on it
 enable_testing()

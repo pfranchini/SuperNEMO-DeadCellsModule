@@ -7,3 +7,4 @@
 *.conf
 *.log
 */*.png
+scripts/efficiency

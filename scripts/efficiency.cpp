@@ -69,10 +69,10 @@ int main(int argc, char* argv[]){
   Float_t zero = efficiency->GetBinContent(1)/t1->GetEntries();
   Float_t single = efficiency->GetBinContent(2)/t1->GetEntries();
 
-  std::cout << "Efficiency:   " << eff*100 << " %"<< std::endl;
-  std::cout << "Zero tracks:  " << zero*100 << " %"<< std::endl;
-  std::cout << "Single track: " << single*100 << " %"<< std::endl;
-  std::cout << "More than two tracks: " << 100-(eff+zero+single)*100 << " %"<< std::endl;
+  std::cout << "Efficiency:           " << eff*100 << " %"<< std::endl;
+  std::cout << "Zero_tracks:          " << zero*100 << " %"<< std::endl;
+  std::cout << "Single_track:         " << single*100 << " %"<< std::endl;
+  std::cout << "More_than_two_tracks: " << 100-(eff+zero+single)*100 << " %"<< std::endl;
 
   c1->cd();
   /*efficiency->Draw();

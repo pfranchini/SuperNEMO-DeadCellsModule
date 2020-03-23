@@ -1,2 +1,7 @@
 
-Scripts for running an analysis using this module.
+Scripts for running an analysis using this module
+
+ - process_one.sh <number_of_dead_cells>
+ - process.sh
+
+

@@ -22,7 +22,8 @@ modules : string[1] = "DeadCells"
 # - Module configuration:
 [name="DeadCells" type="DeadCellsModule"]
 filename_out : string = "XXXXX"
-random : boolean = true
+random : boolean = false
 N_dead_cells : integer = YYYYY
 #dead_cells : string = "list_shorts.txt"
+dead_cells : string = "/home/hep/pfranchi/SuperNEMO/SuperNEMO-LazarusModule/scripts/output/random_dead_cells_100.txt"
 

@@ -27,13 +27,13 @@ if [[ "$?" -ne "0" ]]; then
 fi
 
 # Create conf file
-cp DeadCellsModule.conf.in DeadCellsModule.conf
-sed -i "s/XXXXX/${WHERE}\/${FILE}-dc.brio/g" DeadCellsModule.conf
-sed -i "s/YYYYY/${DEAD_CELLS}/g" DeadCellsModule.conf
+cp DeadCellsModule.conf.in ${WHERE}/DeadCellsModule.conf
+sed -i "s/XXXXX/${WHERE}\/${FILE}-dc.brio/g" ${WHERE}/DeadCellsModule.conf
+sed -i "s/YYYYY/${DEAD_CELLS}/g" ${WHERE}/DeadCellsModule.conf
 
 # Runs the dead cell module
 echo -e "\nRuns the dead cell module...\n"
-${FALAISE}flreconstruct -i ${WHERE}/${FILE}-cal.brio -p DeadCellsModule.conf
+${FALAISE}flreconstruct -i ${WHERE}/${FILE}-cal.brio -p ${WHERE}/DeadCellsModule.conf
 if [[ "$?" -ne "0" ]]; then
     exit
 fi

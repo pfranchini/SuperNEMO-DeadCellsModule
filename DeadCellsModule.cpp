@@ -266,7 +266,7 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
   }
   else {
     // Dead cells from service
-    std::cout << "Reading dead cells..." << std::endl;
+    std::cout << "Reading dead cells from file..." << std::endl;
     dead_cells_service(dead_cells);
   }
 
