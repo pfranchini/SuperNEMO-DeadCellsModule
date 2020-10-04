@@ -34,7 +34,7 @@ DPP_MODULE_REGISTRATION_IMPLEMENT(DeadCellsModule,"DeadCellsModule");
 
 //=================================================================
 
-DeadCellsModule::DeadCellsModule() : dpp::base_module() {}
+DeadCellsModule::DeadCellsModule(datatools::service_manager& services) : dpp::base_module(), mySVC_{services} {}
 
 
 DeadCellsModule::~DeadCellsModule() {
@@ -174,8 +174,8 @@ void dead_cells_service(int dc[2500][3]) {
 
 
 void DeadCellsModule::initialize(const datatools::properties& myConfig,
-			    datatools::service_manager& flServices,
-			    dpp::module_handle_dict_type& /*moduleDict*/){
+				 datatools::service_manager& flServices,
+				 dpp::module_handle_dict_type& /*moduleDict*/) {
 
   // Extract the filename_out key from the supplied config, if the key exists.
   // datatools::properties throws an exception if the key isn't in the config, so catch this if thrown
@@ -185,6 +185,11 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
   catch (std::logic_error& e) {
     std::cerr << "Problem in the output file " << e.what() << std::endl;
   };
+
+  // Test service
+  std::cout << "Test service " << std::endl;
+  mySVC_->reset();
+
 
   // Extract option to create random dead cells or to read them (from a file)   
   try {
@@ -209,8 +214,8 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
   std::cout << "Dead cells module initialized..." << std::endl;
   std::cout << "Output file: " << filename_output << std::endl;
   
- 
-  flSimParameters = FLSimulate::FLSimulateArgs::makeDefault();
+  
+  //  flSimParameters = FLSimulate::FLSimulateArgs::makeDefault();
 
   datatools::service_manager services("DeadCells", "SuperNEMO Dead Cells");
   datatools::properties services_config;
@@ -292,11 +297,14 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
     //const mctools::simulated_data& CD = event.get<mctools::simulated_data>("CD");
     const auto& calData = event.get<snemo::datamodel::calibrated_data>("CD");
 
-    snemo::datamodel::calibrated_data::tracker_hit_handle_type new_hit_handle(new snemo::datamodel::calibrated_tracker_hit);
-    snemo::datamodel::calibrated_tracker_hit& new_calibrated_tracker_hit = new_hit_handle.grab();
+    //    snemo::datamodel::calibrated_data::tracker_hit_handle_type new_hit_handle(new snemo::datamodel::calibrated_tracker_hit);
+    //    snemo::datamodel::calibrated_data::tracker_hit_handle_type new_hit_handle(new snemo::datamodel::calibrated_tracker_hit);
+    const snemo::datamodel::TrackerHitHdlCollection new_hit_handle;
+    //snemo::datamodel::calibrated_tracker_hit& new_calibrated_tracker_hit = new_hit_handle.grab();
 
     // Loops over tracker hits for this event
-    for (const auto& trackerHitHdl : calData.calibrated_tracker_hits()) {
+
+    for (const auto& trackerHitHdl : calData.tracker_hits()) {
 
       hits++;  // counts the number of hits for all the events
 
@@ -316,8 +324,8 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
       } // end loop in the killing procedure  
       
       if (!kill){ // keeps the Tracker data
-	new_hit_handle = trackerHitHdl;
-	new_calibrated_data->calibrated_tracker_hits().push_back(new_hit_handle);
+	//	new_hit_handle = trackerHitHdl;
+	new_calibrated_data->tracker_hits().push_back(trackerHitHdl);
       }
     } // end loop in the tracker hits
 
@@ -330,7 +338,7 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
     */
     
     // Calorimeter data kept in any case
-    new_calibrated_data->calibrated_calorimeter_hits() = calData.calibrated_calorimeter_hits();
+    new_calibrated_data->calorimeter_hits() = calData.calorimeter_hits();
 
     // write workItem in the new brio file
     dpp::base_module::process_status status = simOutput.process(workItem);    
@@ -338,7 +346,7 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
       std::cerr << "Output module failed" << std::endl;
 
     // clear for next event
-    new_calibrated_data->reset();
+    new_calibrated_data->clear(); //->reset();
 
 
   }

@@ -36,6 +36,10 @@
 #include "falaise/snemo/datamodels/data_model.h"
 #include "falaise/snemo/services/services.h"
 
+
+#include <falaise/snemo/services/service_handle.h>
+#include "/pbs/home/p/pfranchi/build/Falaise.ben/source/falaise/test/plugin_service.h"  
+
 // This Project
 #include "lib/FLSimulateArgs.h"
 
@@ -43,6 +47,7 @@ class DeadCellsModule : public dpp::base_module {
 
  public:
   //! Construct module
+  //  DeadCellsModule(datatools::service_manager& services);
   DeadCellsModule();
   //! Destructor
   virtual ~DeadCellsModule();
@@ -56,6 +61,8 @@ class DeadCellsModule : public dpp::base_module {
   virtual void reset();
 
 private: 
+
+  snemo::service_handle<plugin_service> mySVC_;
   
   // configurable data member
   //std::string filename_output_;
