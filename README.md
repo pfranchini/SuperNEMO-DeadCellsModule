@@ -12,7 +12,7 @@ Output: filtered simulated data with CD bank, to be used in a full reconstructio
 
 ## Build:
 ```
-git clone https://github.com/pfranchini/SuperNEMO-DeadCellsModule
+git clone https://github.com/SuperNEMO-DBD/SuperNEMO-DeadCellsModule
 mkdir SuperNEMO-DeadCellsModule.build
 cd SuperNEMO-DeadCellsModule.build
 cmake -DCMAKE_PREFIX_PATH=<path_Falaise_build> -DGSL_ROOT_DIR=<path_GSL_build> ../SuperNEMO-DeadCellsModule
