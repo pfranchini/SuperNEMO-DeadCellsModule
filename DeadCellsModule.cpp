@@ -34,7 +34,7 @@ DPP_MODULE_REGISTRATION_IMPLEMENT(DeadCellsModule,"DeadCellsModule");
 
 //=================================================================
 
-DeadCellsModule::DeadCellsModule(datatools::service_manager& services) : dpp::base_module(), mySVC_{services} {}
+DeadCellsModule::DeadCellsModule(const datatools::properties&, datatools::service_manager& services) {} //: dpp::base_module(), HW_{services} {}
 
 
 DeadCellsModule::~DeadCellsModule() {
@@ -187,9 +187,38 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
   };
 
   // Test service
-  std::cout << "Test service " << std::endl;
-  mySVC_->reset();
+  datatools::service_manager dummyServices{};
+  datatools::multi_properties config;
+  config.add_section("dead_cells_svc", "snemo::dead_cells_svc");
+  dummyServices.load(config);
+  dummyServices.initialize();
 
+  snemo::service_handle<snemo::dead_cells_svc> DC_{dummyServices};
+  std::cout << "Test service " << std::endl;
+  DC_->LoadCells("cells_test.txt");
+  //std::cout << DC_->is_initialized();
+  std::cout << "Vector of bad cell with size: " << DC_->size() << std::endl;
+
+  std::cout << "Cell Status of 0,2,4: " << static_cast<int>(DC_->CellStatus(0,2,4,100)) << std::endl; // side, layer, column, run_number
+  std::cout << "Cell Status of 1,1,1: " << static_cast<int>(DC_->CellStatus(1,1,1,100)) << std::endl;
+  std::cout << "Is 0,2,4 a bad cell: " << DC_->isABadCell(0,2,4,100) << std::endl;
+  std::cout << "Is 1,1,1 a bad cell: " << DC_->isABadCell(1,1,1,100) << std::endl;
+  std::cout << "Is 0,2,4 a good cell: " << DC_->isAGoodCell(0,2,4,100) << std::endl;
+  std::cout << "Is 1,1,1 a good cell: " << DC_->isAGoodCell(1,1,1,100) << std::endl;
+  std::cout << "Is 0,2,4 a dead cell: " << DC_->isADeadCell(0,2,4,100) << std::endl;
+  std::cout << "Is 1,1,1 a dead cell: " << DC_->isADeadCell(1,1,1,100) << std::endl;
+
+  snemo::cell_id cid(0,2,4);
+  std::cout << "Side: " << cid.GetSide() << std::endl;
+  std::cout << "Layer: " << cid.GetLayer() << std::endl;
+  std::cout << "Column: " << cid.GetColumn() << std::endl;
+  std::cout << "Cell Status of 0,2,4: " << static_cast<int>(DC_->CellStatus(cid,100)) << std::endl; // cell_id, run_number
+  std::cout << "Is 0,2,4 a bad cell: " << DC_->isABadCell(cid,100) << std::endl;
+  std::cout << "Is 0,2,4 a good cell: " << DC_->isAGoodCell(cid,100) << std::endl;
+  std::cout << "Is 0,2,4 a dead cell: " << DC_->isADeadCell(cid,100) << std::endl;
+
+  //std::cout << "Cell Status of 0,2,4: " << DC_->CellStatus(2,2,4000,100) << std::endl;  // out of range
+  //snemo::cell_id cid2(3,9,200);
 
   // Extract option to create random dead cells or to read them (from a file)   
   try {
