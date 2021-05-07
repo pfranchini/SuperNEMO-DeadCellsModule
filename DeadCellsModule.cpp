@@ -34,7 +34,7 @@ DPP_MODULE_REGISTRATION_IMPLEMENT(DeadCellsModule,"DeadCellsModule");
 
 //=================================================================
 
-DeadCellsModule::DeadCellsModule() : dpp::base_module() {}
+DeadCellsModule::DeadCellsModule(const datatools::properties&, datatools::service_manager& services) {} //: dpp::base_module(), HW_{services} {}
 
 
 DeadCellsModule::~DeadCellsModule() {
@@ -174,8 +174,8 @@ void dead_cells_service(int dc[2500][3]) {
 
 
 void DeadCellsModule::initialize(const datatools::properties& myConfig,
-			    datatools::service_manager& flServices,
-			    dpp::module_handle_dict_type& /*moduleDict*/){
+				 datatools::service_manager& flServices,
+				 dpp::module_handle_dict_type& /*moduleDict*/) {
 
   // Extract the filename_out key from the supplied config, if the key exists.
   // datatools::properties throws an exception if the key isn't in the config, so catch this if thrown
@@ -185,6 +185,40 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
   catch (std::logic_error& e) {
     std::cerr << "Problem in the output file " << e.what() << std::endl;
   };
+
+  // Test service
+  datatools::service_manager dummyServices{};
+  datatools::multi_properties config;
+  config.add_section("dead_cells_svc", "snemo::dead_cells_svc");
+  dummyServices.load(config);
+  dummyServices.initialize();
+
+  snemo::service_handle<snemo::dead_cells_svc> DC_{dummyServices};
+  std::cout << "Test service " << std::endl;
+  DC_->LoadCells("cells_test.txt");
+  //std::cout << DC_->is_initialized();
+  std::cout << "Vector of bad cell with size: " << DC_->size() << std::endl;
+
+  std::cout << "Cell Status of 0,2,4: " << static_cast<int>(DC_->CellStatus(0,2,4,100)) << std::endl; // side, layer, column, run_number
+  std::cout << "Cell Status of 1,1,1: " << static_cast<int>(DC_->CellStatus(1,1,1,100)) << std::endl;
+  std::cout << "Is 0,2,4 a bad cell: " << DC_->isABadCell(0,2,4,100) << std::endl;
+  std::cout << "Is 1,1,1 a bad cell: " << DC_->isABadCell(1,1,1,100) << std::endl;
+  std::cout << "Is 0,2,4 a good cell: " << DC_->isAGoodCell(0,2,4,100) << std::endl;
+  std::cout << "Is 1,1,1 a good cell: " << DC_->isAGoodCell(1,1,1,100) << std::endl;
+  std::cout << "Is 0,2,4 a dead cell: " << DC_->isADeadCell(0,2,4,100) << std::endl;
+  std::cout << "Is 1,1,1 a dead cell: " << DC_->isADeadCell(1,1,1,100) << std::endl;
+
+  snemo::cell_id cid(0,2,4);
+  std::cout << "Side: " << cid.GetSide() << std::endl;
+  std::cout << "Layer: " << cid.GetLayer() << std::endl;
+  std::cout << "Column: " << cid.GetColumn() << std::endl;
+  std::cout << "Cell Status of 0,2,4: " << static_cast<int>(DC_->CellStatus(cid,100)) << std::endl; // cell_id, run_number
+  std::cout << "Is 0,2,4 a bad cell: " << DC_->isABadCell(cid,100) << std::endl;
+  std::cout << "Is 0,2,4 a good cell: " << DC_->isAGoodCell(cid,100) << std::endl;
+  std::cout << "Is 0,2,4 a dead cell: " << DC_->isADeadCell(cid,100) << std::endl;
+
+  //std::cout << "Cell Status of 0,2,4: " << DC_->CellStatus(2,2,4000,100) << std::endl;  // out of range
+  //snemo::cell_id cid2(3,9,200);
 
   // Extract option to create random dead cells or to read them (from a file)   
   try {
@@ -209,8 +243,8 @@ void DeadCellsModule::initialize(const datatools::properties& myConfig,
   std::cout << "Dead cells module initialized..." << std::endl;
   std::cout << "Output file: " << filename_output << std::endl;
   
- 
-  flSimParameters = FLSimulate::FLSimulateArgs::makeDefault();
+  
+  //  flSimParameters = FLSimulate::FLSimulateArgs::makeDefault();
 
   datatools::service_manager services("DeadCells", "SuperNEMO Dead Cells");
   datatools::properties services_config;
@@ -292,11 +326,14 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
     //const mctools::simulated_data& CD = event.get<mctools::simulated_data>("CD");
     const auto& calData = event.get<snemo::datamodel::calibrated_data>("CD");
 
-    snemo::datamodel::calibrated_data::tracker_hit_handle_type new_hit_handle(new snemo::datamodel::calibrated_tracker_hit);
-    snemo::datamodel::calibrated_tracker_hit& new_calibrated_tracker_hit = new_hit_handle.grab();
+    //    snemo::datamodel::calibrated_data::tracker_hit_handle_type new_hit_handle(new snemo::datamodel::calibrated_tracker_hit);
+    //    snemo::datamodel::calibrated_data::tracker_hit_handle_type new_hit_handle(new snemo::datamodel::calibrated_tracker_hit);
+    const snemo::datamodel::TrackerHitHdlCollection new_hit_handle;
+    //snemo::datamodel::calibrated_tracker_hit& new_calibrated_tracker_hit = new_hit_handle.grab();
 
     // Loops over tracker hits for this event
-    for (const auto& trackerHitHdl : calData.calibrated_tracker_hits()) {
+
+    for (const auto& trackerHitHdl : calData.tracker_hits()) {
 
       hits++;  // counts the number of hits for all the events
 
@@ -316,8 +353,8 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
       } // end loop in the killing procedure  
       
       if (!kill){ // keeps the Tracker data
-	new_hit_handle = trackerHitHdl;
-	new_calibrated_data->calibrated_tracker_hits().push_back(new_hit_handle);
+	//	new_hit_handle = trackerHitHdl;
+	new_calibrated_data->tracker_hits().push_back(trackerHitHdl);
       }
     } // end loop in the tracker hits
 
@@ -330,7 +367,7 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
     */
     
     // Calorimeter data kept in any case
-    new_calibrated_data->calibrated_calorimeter_hits() = calData.calibrated_calorimeter_hits();
+    new_calibrated_data->calorimeter_hits() = calData.calorimeter_hits();
 
     // write workItem in the new brio file
     dpp::base_module::process_status status = simOutput.process(workItem);    
@@ -338,7 +375,7 @@ dpp::base_module::process_status DeadCellsModule::process(datatools::things& eve
       std::cerr << "Output module failed" << std::endl;
 
     // clear for next event
-    new_calibrated_data->reset();
+    new_calibrated_data->clear(); //->reset();
 
 
   }

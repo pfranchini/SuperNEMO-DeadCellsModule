@@ -1,5 +1,4 @@
-// FLSimulateCommandLine.h - Interface for FLSimulate command line arguments and
-// processing
+// FLSimulateCommandLine.h - Interface for FLSimulate command line arguments and processing
 //
 // Copyright (c) 2013 by Ben Morgan <bmorgan.warwick@gmail.com>
 // Copyright (c) 2013 by The University of Warwick
@@ -18,6 +17,7 @@
 
 // Standard Library:
 #include <string>
+#include <vector>
 
 // Third Party
 // - Boost
@@ -31,12 +31,12 @@ namespace FLSimulate {
 // Help and so on are not marked because these are handled by the UI.
 struct FLSimulateCommandLine {
   datatools::logger::priority logLevel;  //!< Logging priority threshold
+  std::string userProfile;               //!< User profile
+  std::vector<std::string> mountPoints;  //!< Directory mount directives
   std::string configScript;              //!< Path to configuration script
   std::string outputMetadataFile;        //!< Path for saving metadata
-  bool embeddedMetadata;    //!< Flag to embed metadata in the output data file
-  std::string outputFile;   //!< Path for the output module
-  std::string userProfile;  //!< User profile
-
+  bool embeddedMetadata;                 //!< Flag to embed metadata in the output data file
+  std::string outputFile;                //!< Path for the output module
   static FLSimulateCommandLine makeDefault();
 };
 
